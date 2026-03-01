@@ -256,13 +256,14 @@ async def gestionar_mensajes(update: Update, context: ContextTypes.DEFAULT_TYPE)
             await update.message.reply_text(f"✅ {prod_nom} agregado. Subtotal: ${can * pre}\nTotal actual: ${sum(i['subtotal'] for i in carritos[u])}")
 
 if __name__ == '__main__':
-    # Configuración de la aplicación con timeouts extendidos para evitar errores de red en Hugging Face
-    app = ApplicationBuilder().token(TOKEN).connect_timeout(30).read_timeout(30).write_timeout(30).pool_timeout(30).build()
+    # Agregamos parámetros de red más resistentes
+    app = ApplicationBuilder().token(TOKEN).connect_timeout(30).read_timeout(30).build()
     
     app.add_handler(CommandHandler("start", start))
-    app.add_handler(CommandHandler("inicio", start))
     app.add_handler(CallbackQueryHandler(manejador_callback))
     app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, gestionar_mensajes))
     
     print("BOT LISTO - INTENTANDO CONECTAR...")
+    
+    # run_polling con reintentos automáticos
     app.run_polling(drop_pending_updates=True)
